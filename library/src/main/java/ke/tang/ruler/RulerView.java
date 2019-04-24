@@ -37,7 +37,6 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -320,8 +319,6 @@ public class RulerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         final int contentOffset = mContentOffset;
-        final int maxContentOffset = mMaxContentOffset;
-        final int minContentOffset = mMinContentOffset;
         final int paddingLeft = getPaddingLeft();
         final int paddingRight = getPaddingRight();
         final int paddingTop = getPaddingTop();
@@ -339,11 +336,11 @@ public class RulerView extends View {
 
         mRulerPaint.setColor(mScaleColor.isStateful() ? mScaleColor.getColorForState(drawableState, Color.BLACK) : mScaleColor.getDefaultColor());
 
-        //向前绘制刻度，绘制到左边界停止
+        //Draw scales forward and draw to the left border to stop
         if (null != mTextColor) {
             mLabelPaint.setColor(mTextColor.getColorForState(drawableState, Color.BLACK));
         }
-        final float fontY = rulerHeight - getPaddingBottom() - rulerSize - mScaleMaxHeight - mFontMetrics.bottom;
+        final float fontY = rulerSize + mScaleMaxHeight + mFontMetrics.bottom * 4;
         int count = contentOffset / mStepWidth;
         for (int index = Math.min(count, maxScaleCount); index >= minScaleCount; index--) {
             int scalePosition = index * mStepWidth;
@@ -352,19 +349,20 @@ public class RulerView extends View {
             final float right = centerX + scaleSize / 2;
             String label = null != mRulerValueFormatter ? mRulerValueFormatter.formatValue(index) : String.valueOf(index);
             final float labelRight = centerX + mLabelPaint.measureText(label) / 2;
+
             if (labelRight > 0) {
                 if (0 == index % mSectionScaleCount || index == maxScaleCount || index == minScaleCount) {
-                    canvas.drawRect(left, rulerHeight - rulerSize - paddingBottom - mScaleMaxHeight, right, rulerHeight - rulerSize - paddingBottom, mRulerPaint);
+                    canvas.drawRect(left, 0, right, mScaleMaxHeight, mRulerPaint);
                     canvas.drawText(label, centerX, fontY, mLabelPaint);
                 } else {
-                    canvas.drawRect(left, rulerHeight - rulerSize - paddingBottom - mScaleMinHeight, right, rulerHeight - rulerSize - paddingBottom, mRulerPaint);
+                    canvas.drawRect(left, 0, right, mScaleMinHeight, mRulerPaint);
                 }
             } else {
                 break;
             }
         }
 
-        //向后绘制刻度，绘制到右边界停止
+        //Draw scales backwards, draw from marker to the right
         for (int index = Math.max(minScaleCount, count); index <= maxScaleCount; index++) {
             int scalePosition = index * mStepWidth;
             final float centerX = paddingLeft + halfInsetWidth + scalePosition - contentOffset;
@@ -374,20 +372,17 @@ public class RulerView extends View {
             final float labelLeft = centerX - mLabelPaint.measureText(label) / 2;
             if (labelLeft < width) {
                 if (0 == index % mSectionScaleCount || index == maxScaleCount || index == minScaleCount) {
-                    canvas.drawRect(left, rulerHeight - rulerSize - paddingBottom - mScaleMaxHeight, right, rulerHeight - rulerSize - paddingBottom, mRulerPaint);
+                    canvas.drawRect(left, 0, right, mScaleMaxHeight, mRulerPaint);
                     canvas.drawText(label, centerX, fontY, mLabelPaint);
                 } else {
-                    canvas.drawRect(left, rulerHeight - rulerSize - paddingBottom - mScaleMinHeight, right, rulerHeight - rulerSize - paddingBottom, mRulerPaint);
+                    canvas.drawRect(left, 0, right, mScaleMinHeight, mRulerPaint);
                 }
             } else {
                 break;
             }
         }
-        //绘制底部横线
-        mRulerPaint.setColor(mRulerColor.isStateful() ? mRulerColor.getColorForState(drawableState, Color.BLACK) : mRulerColor.getDefaultColor());
-        canvas.drawRect(Math.max(0, paddingLeft + halfInsetWidth - contentOffset + minContentOffset), rulerHeight - paddingBottom - rulerSize, Math.min(width, width - paddingRight - halfInsetWidth + maxContentOffset - contentOffset), rulerHeight - paddingBottom, mRulerPaint);
 
-        //绘制Marker
+        //Drawing Marker
         if (!mMarkers.isEmpty()) {
             for (Marker marker : mMarkers) {
                 int scalePosition = marker.value() * mStepWidth;
@@ -407,7 +402,7 @@ public class RulerView extends View {
             }
         }
 
-        //绘制指示器
+        //Draw indicator
         if (null != mIndicator) {
             final Drawable indicator = mIndicator;
             if (indicator.isStateful()) {
@@ -558,66 +553,6 @@ public class RulerView extends View {
     }
 
     /**
-     * 设置文本尺寸
-     *
-     * @param textSize
-     */
-    public void setTextSize(float textSize) {
-        mTextSize = textSize;
-        mLabelPaint.setTextSize(textSize);
-        mFontMetrics = mLabelPaint.getFontMetrics();
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 设置文本颜色
-     *
-     * @param color
-     */
-    public void setTextColor(@ColorInt int color) {
-        setTextColor(ColorStateList.valueOf(color));
-    }
-
-    /**
-     * 设置刻度颜色
-     *
-     * @param color
-     */
-    public void setScaleColor(@ColorInt int color) {
-        setScaleColor(ColorStateList.valueOf(color));
-    }
-
-    /**
-     * 设置刻度颜色
-     *
-     * @param color
-     */
-    public void setScaleColor(ColorStateList color) {
-        mScaleColor = color;
-        invalidate();
-    }
-
-    /**
-     * 设置标尺颜色，底部横线
-     *
-     * @param color
-     */
-    public void setRulerColor(@ColorInt int color) {
-        setRulerColor(ColorStateList.valueOf(color));
-    }
-
-    /**
-     * 设置标尺颜色，底部横线
-     *
-     * @param color
-     */
-    public void setRulerColor(ColorStateList color) {
-        mRulerColor = color;
-        invalidate();
-    }
-
-    /**
      * 设置用于格式化标尺值
      *
      * @param rulerValueFormatter
@@ -626,6 +561,20 @@ public class RulerView extends View {
         mRulerValueFormatter = rulerValueFormatter;
         notifyValueChanged();
         invalidate();
+    }
+
+    private void resetStateAndAbortScroll() {
+        mState = STATE_IDLE;
+        mScroller.abortAnimation();
+    }
+
+    /**
+     * 获取当前值
+     *
+     * @return
+     */
+    public int getValue() {
+        return mValue;
     }
 
     /**
@@ -644,20 +593,6 @@ public class RulerView extends View {
         notifyValueChanged();
     }
 
-    private void resetStateAndAbortScroll() {
-        mState = STATE_IDLE;
-        mScroller.abortAnimation();
-    }
-
-    /**
-     * 获取当前值
-     *
-     * @return
-     */
-    public int getValue() {
-        return mValue;
-    }
-
     /**
      * 获取格式化的值，如果没有设置{@link RulerValueFormatter}，就是默认的值转换成文本类型
      *
@@ -674,16 +609,6 @@ public class RulerView extends View {
      */
     public void setOnRulerValueChangeListener(OnRulerValueChangeListener onRulerValueChangeListener) {
         mOnRulerValueChangeListener = onRulerValueChangeListener;
-    }
-
-    /**
-     * 设置标尺文本颜色
-     *
-     * @param color
-     */
-    public void setTextColor(ColorStateList color) {
-        mTextColor = color;
-        invalidate();
     }
 
     /**
@@ -714,6 +639,114 @@ public class RulerView extends View {
     }
 
     /**
+     * 获取刻度与刻度之间的距离
+     *
+     * @return 单位：像素
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getStepWidth() {
+        return mStepWidth;
+    }
+
+    /**
+     * 设置刻度与刻度之间的距离，必须大于1
+     *
+     * @param stepWidth 单位：像素
+     */
+    public void setStepWidth(int stepWidth) {
+        mStepWidth = Math.max(1, stepWidth);
+        setValue(mValue);
+    }
+
+    /**
+     * 获取刻度颜色
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public ColorStateList getScaleColor() {
+        return mScaleColor;
+    }
+
+    /**
+     * 设置刻度颜色
+     *
+     * @param color
+     */
+    public void setScaleColor(@ColorInt int color) {
+        setScaleColor(ColorStateList.valueOf(color));
+    }
+
+    /**
+     * 设置刻度颜色
+     *
+     * @param color
+     */
+    public void setScaleColor(ColorStateList color) {
+        mScaleColor = color;
+        invalidate();
+    }
+
+    /**
+     * 获取标尺颜色（底部横线）
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public ColorStateList getRulerColor() {
+        return mRulerColor;
+    }
+
+    /**
+     * 设置标尺颜色，底部横线
+     *
+     * @param color
+     */
+    public void setRulerColor(@ColorInt int color) {
+        setRulerColor(ColorStateList.valueOf(color));
+    }
+
+    /**
+     * 设置标尺颜色，底部横线
+     *
+     * @param color
+     */
+    public void setRulerColor(ColorStateList color) {
+        mRulerColor = color;
+        invalidate();
+    }
+
+    /**
+     * 获取大刻度和大刻度之间的小刻度数
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getSectionScaleCount() {
+        return mSectionScaleCount;
+    }
+
+    /**
+     * 设置大刻度和大刻度之间小刻度数量
+     *
+     * @param sectionScaleCount
+     */
+    public void setSectionScaleCount(int sectionScaleCount) {
+        mSectionScaleCount = Math.max(0, sectionScaleCount);
+        invalidate();
+    }
+
+    /**
+     * 获取指示器
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public Drawable getIndicator() {
+        return mIndicator;
+    }
+
+    /**
      * 设置指示器，用于显示在标尺中间
      *
      * @param res
@@ -739,6 +772,100 @@ public class RulerView extends View {
     }
 
     /**
+     * 获取小刻度的高度
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getScaleMinHeight() {
+        return mScaleMinHeight;
+    }
+
+    /**
+     * 设置小刻度的高度
+     *
+     * @param scaleMinHeight
+     */
+    public void setScaleMinHeight(int scaleMinHeight) {
+        mScaleMinHeight = scaleMinHeight;
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * 获取大刻度的高度
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getScaleMaxHeight() {
+        return mScaleMaxHeight;
+    }
+
+    /**
+     * 设置大刻度的高度
+     *
+     * @param scaleMaxHeight
+     */
+    public void setScaleMaxHeight(int scaleMaxHeight) {
+        mScaleMaxHeight = scaleMaxHeight;
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * 获取刻度宽度
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getScaleSize() {
+        return mScaleSize;
+    }
+
+    /**
+     * 设置刻度宽度
+     *
+     * @param scaleSize
+     */
+    public void setScaleSize(int scaleSize) {
+        mScaleSize = Math.max(0, scaleSize);
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * 获取标尺高度（底部横线）
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getRulerSize() {
+        return mRulerSize;
+    }
+
+    /**
+     * 设置标尺高度（底部横线）
+     *
+     * @param rulerSize
+     */
+    public void setRulerSize(int rulerSize) {
+        mRulerSize = Math.max(0, rulerSize);
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * 获取最大值
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getMaxValue() {
+        return mMaxValue;
+    }
+
+    /**
      * 设置最大值限制
      * 如果当前值大于设置的最大值，会自动调整当前值为最大值
      *
@@ -750,6 +877,16 @@ public class RulerView extends View {
         }
         mMaxValue = maxValue;
         setValue(mValue);
+    }
+
+    /**
+     * 获取最小值
+     *
+     * @return
+     */
+    @ViewDebug.ExportedProperty(category = "custom")
+    public int getMinValue() {
+        return mMinValue;
     }
 
     /**
@@ -767,180 +904,6 @@ public class RulerView extends View {
     }
 
     /**
-     * 设置刻度宽度
-     *
-     * @param scaleSize
-     */
-    public void setScaleSize(int scaleSize) {
-        mScaleSize = Math.max(0, scaleSize);
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 设置标尺高度（底部横线）
-     *
-     * @param rulerSize
-     */
-    public void setRulerSize(int rulerSize) {
-        mRulerSize = Math.max(0, rulerSize);
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 设置刻度与刻度之间的距离，必须大于1
-     *
-     * @param stepWidth 单位：像素
-     */
-    public void setStepWidth(int stepWidth) {
-        mStepWidth = Math.max(1, stepWidth);
-        setValue(mValue);
-    }
-
-    /**
-     * 设置大刻度和大刻度之间小刻度数量
-     *
-     * @param sectionScaleCount
-     */
-    public void setSectionScaleCount(int sectionScaleCount) {
-        mSectionScaleCount = Math.max(0, sectionScaleCount);
-        invalidate();
-    }
-
-    /**
-     * 设置小刻度的高度
-     *
-     * @param scaleMinHeight
-     */
-    public void setScaleMinHeight(int scaleMinHeight) {
-        mScaleMinHeight = scaleMinHeight;
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 设置大刻度的高度
-     *
-     * @param scaleMaxHeight
-     */
-    public void setScaleMaxHeight(int scaleMaxHeight) {
-        mScaleMaxHeight = scaleMaxHeight;
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * 获取刻度与刻度之间的距离
-     *
-     * @return 单位：像素
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getStepWidth() {
-        return mStepWidth;
-    }
-
-    /**
-     * 获取刻度颜色
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public ColorStateList getScaleColor() {
-        return mScaleColor;
-    }
-
-    /**
-     * 获取标尺颜色（底部横线）
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public ColorStateList getRulerColor() {
-        return mRulerColor;
-    }
-
-    /**
-     * 获取大刻度和大刻度之间的小刻度数
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getSectionScaleCount() {
-        return mSectionScaleCount;
-    }
-
-    /**
-     * 获取指示器
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public Drawable getIndicator() {
-        return mIndicator;
-    }
-
-    /**
-     * 获取小刻度的高度
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getScaleMinHeight() {
-        return mScaleMinHeight;
-    }
-
-    /**
-     * 获取大刻度的高度
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getScaleMaxHeight() {
-        return mScaleMaxHeight;
-    }
-
-    /**
-     * 获取刻度宽度
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getScaleSize() {
-        return mScaleSize;
-    }
-
-    /**
-     * 获取标尺高度（底部横线）
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getRulerSize() {
-        return mRulerSize;
-    }
-
-    /**
-     * 获取最大值
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getMaxValue() {
-        return mMaxValue;
-    }
-
-    /**
-     * 获取最小值
-     *
-     * @return
-     */
-    @ViewDebug.ExportedProperty(category = "custom")
-    public int getMinValue() {
-        return mMinValue;
-    }
-
-    /**
      * 获取文本尺寸
      *
      * @return
@@ -951,6 +914,19 @@ public class RulerView extends View {
     }
 
     /**
+     * 设置文本尺寸
+     *
+     * @param textSize
+     */
+    public void setTextSize(float textSize) {
+        mTextSize = textSize;
+        mLabelPaint.setTextSize(textSize);
+        mFontMetrics = mLabelPaint.getFontMetrics();
+        requestLayout();
+        invalidate();
+    }
+
+    /**
      * 获取文本颜色
      *
      * @return
@@ -958,6 +934,25 @@ public class RulerView extends View {
     @ViewDebug.ExportedProperty(category = "custom")
     public ColorStateList getTextColor() {
         return mTextColor;
+    }
+
+    /**
+     * 设置文本颜色
+     *
+     * @param color
+     */
+    public void setTextColor(@ColorInt int color) {
+        setTextColor(ColorStateList.valueOf(color));
+    }
+
+    /**
+     * 设置标尺文本颜色
+     *
+     * @param color
+     */
+    public void setTextColor(ColorStateList color) {
+        mTextColor = color;
+        invalidate();
     }
 
     @Override
@@ -1032,6 +1027,17 @@ public class RulerView extends View {
     }
 
     private static class SavedState extends BaseSavedState {
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         private int mStepWidth;
         private ColorStateList mScaleColor;
         private ColorStateList mRulerColor;
@@ -1099,17 +1105,5 @@ public class RulerView extends View {
             out.writeInt(mMinContentOffset);
             out.writeList(mMarkers);
         }
-
-        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }
