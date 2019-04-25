@@ -228,6 +228,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.arrowIndicator:
                         mRuler.setIndicator(R.drawable.arrow_indicator_tint);
                         break;
+                    case R.id.cursorIndicator:
+                        mRuler.setIndicator(R.drawable.ic_cursor);
+                        break;
                 }
             }
         });

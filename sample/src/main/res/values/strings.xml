@@ -23,6 +23,7 @@
     <string name="notification_min_value_exceed">Min value can not exceed max value %1$d</string>
     <string name="notification_max_value_exceed">Max value can not under min value %1$d</string>
     <string name="notification_marker_clicked">Marker clicked</string>
+    <string name="indicator_cursor">Cursor</string>
 
     <string-array name="colors">
         <item>Default</item>

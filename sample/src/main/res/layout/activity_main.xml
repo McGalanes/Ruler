@@ -126,6 +126,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/indicator_arrow" />
 
+                <RadioButton
+                    android:id="@+id/cursorIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/indicator_cursor" />
             </RadioGroup>
 
             <!--刻度最小高度-->

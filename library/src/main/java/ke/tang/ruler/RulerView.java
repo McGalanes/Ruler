@@ -408,7 +408,12 @@ public class RulerView extends View {
             if (indicator.isStateful()) {
                 indicator.setState(drawableState);
             }
-            indicator.setBounds(paddingLeft + halfInsetWidth - indicator.getIntrinsicWidth() / 2, paddingTop, paddingLeft + halfInsetWidth + indicator.getIntrinsicWidth() / 2, rulerHeight - paddingBottom);
+            indicator.setBounds(
+                    paddingLeft + halfInsetWidth - indicator.getIntrinsicWidth() / 2,
+                    paddingTop,
+                    paddingLeft + halfInsetWidth + indicator.getIntrinsicWidth() / 2,
+                    mIndicator.getIntrinsicHeight()
+            );
             indicator.draw(canvas);
         }
     }
