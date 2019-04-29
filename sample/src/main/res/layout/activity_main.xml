@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
               android:padding="8dp">
-
-    <TextView
-        android:id="@+id/result"
-        style="?android:textAppearanceMedium"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        tools:text="1"/>
 
     <ke.tang.ruler.RulerView
         android:id="@+id/ruler"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_marginTop="8dp"
-        app:circleColor="#676767"
+        app:circleColor="#21222E"
         app:indicator="@drawable/default_ruler_indicator"
         app:maxValue="1000"
         app:scaleColor="#333"

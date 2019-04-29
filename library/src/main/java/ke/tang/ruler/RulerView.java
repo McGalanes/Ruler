@@ -79,7 +79,7 @@ public class RulerView extends View {
     private int mValue;
 
     private float mTextSize;
-    private ColorStateList mTextColor;
+    private ColorStateList mScaleTextColor;
     private OnRulerValueChangeListener mOnRulerValueChangeListener;
     private OverScroller mScroller;
     private int mContentOffset;
@@ -87,6 +87,7 @@ public class RulerView extends View {
     private int mMinContentOffset;
     private Paint mRulerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private TextPaint mScaleLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private TextPaint mLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private float mLastX;
@@ -279,8 +280,8 @@ public class RulerView extends View {
         mScaleLabelPaint.setTextAlign(Paint.Align.CENTER);
 
         //Draw scales forward and draw to the left border to stop
-        if (null != mTextColor) {
-            mScaleLabelPaint.setColor(mTextColor.getColorForState(drawableState, Color.BLACK));
+        if (null != mScaleTextColor) {
+            mScaleLabelPaint.setColor(mScaleTextColor.getColorForState(drawableState, Color.BLACK));
         }
 
         //Draw indicator
@@ -367,6 +368,15 @@ public class RulerView extends View {
         float topAndBottomCirclePadding = 8;
         float radius = (height - mIndicator.getIntrinsicHeight()) / 2f - 2f * topAndBottomCirclePadding;
         canvas.drawCircle(halfInsetWidth, circleY, radius, mCirclePaint);
+
+        //Draw Value
+
+        mLabelPaint.setTextSize(50);
+        mLabelPaint.setColor(Color.WHITE);
+        mLabelPaint.setTextAlign(Paint.Align.CENTER);
+        final float yPos = (height - mIndicator.getIntrinsicHeight()) / 2f - ((mLabelPaint.descent() + mLabelPaint.ascent()) / 2f) + mIndicator.getIntrinsicHeight();
+        final float xPos = width / 2f;
+        canvas.drawText(Integer.toString(mValue), xPos, yPos, mLabelPaint);
     }
 
     private int getValueForContentOffset(int contentOffset) {
@@ -713,16 +723,16 @@ public class RulerView extends View {
     }
 
     @ViewDebug.ExportedProperty(category = "custom")
-    public ColorStateList getTextColor() {
-        return mTextColor;
+    public ColorStateList getScaleTextColor() {
+        return mScaleTextColor;
     }
 
-    public void setTextColor(@ColorInt int color) {
+    public void setScaleTextColor(@ColorInt int color) {
         setTextColor(ColorStateList.valueOf(color));
     }
 
     public void setTextColor(ColorStateList color) {
-        mTextColor = color;
+        mScaleTextColor = color;
         invalidate();
     }
 
@@ -762,7 +772,7 @@ public class RulerView extends View {
         mMinValue = savedState.mMinValue;
         mValue = savedState.mValue;
         setTextSize(savedState.mTextSize);
-        mTextColor = savedState.mTextColor;
+        mScaleTextColor = savedState.mTextColor;
         mState = savedState.mState;
         mContentOffset = savedState.mContentOffset;
         mMaxContentOffset = savedState.mMaxContentOffset;
@@ -790,7 +800,7 @@ public class RulerView extends View {
         state.mMinValue = mMinValue;
         state.mValue = mValue;
         state.mTextSize = mTextSize;
-        state.mTextColor = mTextColor;
+        state.mTextColor = mScaleTextColor;
         state.mState = mState;
         state.mContentOffset = mContentOffset;
         state.mMaxContentOffset = mMaxContentOffset;

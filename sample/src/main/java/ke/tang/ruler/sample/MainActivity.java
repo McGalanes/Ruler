@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
     private DefaultState mState;
 
-    private TextView mResult;
     private RulerView mRuler;
     private SeekBar mStepWidth;
     private Spinner mScaleColor;
@@ -115,14 +114,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-        mResult = findViewById(R.id.result);
         mRuler = findViewById(R.id.ruler);
-        mRuler.setOnRulerValueChangeListener(new OnRulerValueChangeListener() {
-            @Override
-            public void onRulerValueChanged(int value, String displayValue) {
-                mResult.setText(displayValue);
-            }
-        });
         mState = new DefaultState(mRuler);
         mStepWidth = findViewById(R.id.stepWidth);
         mStepWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -395,13 +387,13 @@ public class MainActivity extends AppCompatActivity {
                         mRuler.setTextColor(mState.getTextColor());
                         break;
                     case 1:
-                        mRuler.setTextColor(Color.RED);
+                        mRuler.setScaleTextColor(Color.RED);
                         break;
                     case 2:
-                        mRuler.setTextColor(Color.BLUE);
+                        mRuler.setScaleTextColor(Color.BLUE);
                         break;
                     case 3:
-                        mRuler.setTextColor(Color.YELLOW);
+                        mRuler.setScaleTextColor(Color.YELLOW);
                         break;
                 }
             }
@@ -477,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
             mMinValue = ruler.getMinValue();
             mValue = ruler.getValue();
             mTextSize = ruler.getTextSize();
-            mTextColor = ruler.getTextColor();
+            mTextColor = ruler.getScaleTextColor();
         }
 
         public int getStepWidth() {
