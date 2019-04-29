@@ -33,6 +33,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -338,28 +339,29 @@ public class RulerView extends View {
 
         mRulerPaint.setColor(mScaleColor.isStateful() ? mScaleColor.getColorForState(drawableState, Color.BLACK) : mScaleColor.getDefaultColor());
 
+        mLabelPaint.setTextAlign(Paint.Align.CENTER);
+
         //Draw scales forward and draw to the left border to stop
         if (null != mTextColor) {
             mLabelPaint.setColor(mTextColor.getColorForState(drawableState, Color.BLACK));
         }
 
         //Draw indicator
-        if (null != mIndicator) {
-            final Drawable indicator = mIndicator;
-            if (indicator.isStateful()) {
-                indicator.setState(drawableState);
-            }
-            indicator.setBounds(
-                    paddingLeft + halfInsetWidth - indicator.getIntrinsicWidth() / 2,
-                    paddingTop,
-                    paddingLeft + halfInsetWidth + indicator.getIntrinsicWidth() / 2,
-                    mIndicator.getIntrinsicHeight()
-            );
-            indicator.draw(canvas);
+        final Drawable indicator = ContextCompat.getDrawable(getContext(), R.drawable.ic_cursor);
+        mIndicator = indicator;
+        if (indicator.isStateful()) {
+            indicator.setState(drawableState);
         }
+        indicator.setBounds(
+                paddingLeft + halfInsetWidth - mIndicator.getIntrinsicWidth() / 2,
+                paddingTop,
+                paddingLeft + halfInsetWidth + mIndicator.getIntrinsicWidth() / 2,
+                indicator.getIntrinsicHeight()
+        );
+        indicator.draw(canvas);
 
-        float indicatorTextHeight = mLabelPaint.getTextSize();
-        final float fontY = mIndicator.getMinimumHeight() + indicatorTextHeight;//(rulerHeight - mScaleMaxHeight) / 2f + mScaleMaxHeight + mFontMetrics.bottom;
+
+        final float fontY = (height - mIndicator.getIntrinsicHeight()) / 2f - ((mLabelPaint.descent() + mLabelPaint.ascent()) / 2f) + mIndicator.getIntrinsicHeight();
         int count = contentOffset / mStepWidth;
         for (int index = Math.min(count, maxScaleCount); index >= minScaleCount; index--) {
             int scalePosition = index * mStepWidth;
