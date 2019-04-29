@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="8dp">
 
     <TextView
         android:id="@+id/result"
@@ -13,16 +13,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        tools:text="1" />
+        tools:text="1"/>
 
     <ke.tang.ruler.RulerView
         android:id="@+id/ruler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_marginTop="8dp"
+        app:circleColor="#676767"
         app:indicator="@drawable/default_ruler_indicator"
         app:maxValue="1000"
-        app:scaleColor="?colorAccent" />
+        app:scaleColor="#333"
+        app:scaleMaxHeight="10dp"
+        app:scaleMinHeight="5dp"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -41,13 +44,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_step_width" />
+                android:text="@string/label_set_step_width"/>
 
             <SeekBar
                 android:id="@+id/stepWidth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--刻度颜色-->
             <TextView
@@ -55,13 +58,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_scale_color" />
+                android:text="@string/label_set_scale_color"/>
 
             <Spinner
                 android:id="@+id/scaleColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--标尺颜色-->
             <TextView
@@ -69,13 +72,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_ruler_color" />
+                android:text="@string/label_set_ruler_color"/>
 
             <Spinner
                 android:id="@+id/rulerColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
 
             <!--刻度分组数量-->
@@ -84,13 +87,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_section_scale_count" />
+                android:text="@string/label_set_section_scale_count"/>
 
             <SeekBar
                 android:id="@+id/sectionScaleCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--指示器-->
             <TextView
@@ -98,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_indicator" />
+                android:text="@string/label_set_indicator"/>
 
             <RadioGroup
                 android:id="@+id/indicators"
@@ -112,25 +115,25 @@
                     android:id="@+id/defaultIndicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indicator_default" />
+                    android:text="@string/indicator_default"/>
 
                 <RadioButton
                     android:id="@+id/dashedLineIndicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indicator_dashed_line" />
+                    android:text="@string/indicator_dashed_line"/>
 
                 <RadioButton
                     android:id="@+id/arrowIndicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indicator_arrow" />
+                    android:text="@string/indicator_arrow"/>
 
                 <RadioButton
                     android:id="@+id/cursorIndicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/indicator_cursor" />
+                    android:text="@string/indicator_cursor"/>
             </RadioGroup>
 
             <!--刻度最小高度-->
@@ -139,13 +142,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_scale_min_height" />
+                android:text="@string/label_set_scale_min_height"/>
 
             <SeekBar
                 android:id="@+id/scaleMinHeight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--刻度最大高度-->
             <TextView
@@ -153,13 +156,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_scale_max_height" />
+                android:text="@string/label_set_scale_max_height"/>
 
             <SeekBar
                 android:id="@+id/scaleMaxHeight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--刻度尺寸-->
             <TextView
@@ -167,13 +170,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_scale_size" />
+                android:text="@string/label_set_scale_size"/>
 
             <SeekBar
                 android:id="@+id/scaleSize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--标尺尺寸-->
             <TextView
@@ -181,13 +184,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_ruler_size" />
+                android:text="@string/label_set_ruler_size"/>
 
             <SeekBar
                 android:id="@+id/rulerSize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--最大值-->
             <TextView
@@ -195,13 +198,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_max_value" />
+                android:text="@string/label_set_max_value"/>
 
             <SeekBar
                 android:id="@+id/maxValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--最小值-->
             <TextView
@@ -209,13 +212,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_min_value" />
+                android:text="@string/label_set_min_value"/>
 
             <SeekBar
                 android:id="@+id/minValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--当前值-->
             <TextView
@@ -223,7 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_value" />
+                android:text="@string/label_set_value"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -236,14 +239,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberSigned" />
+                    android:inputType="numberSigned"/>
 
                 <Button
                     android:id="@+id/submitValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    android:text="@string/button_confirm" />
+                    android:text="@string/button_confirm"/>
             </LinearLayout>
 
             <!--文本大小-->
@@ -252,13 +255,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_text_size" />
+                android:text="@string/label_set_text_size"/>
 
             <SeekBar
                 android:id="@+id/textSize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--文本颜色-->
             <TextView
@@ -266,13 +269,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_text_color" />
+                android:text="@string/label_set_text_color"/>
 
             <Spinner
                 android:id="@+id/textColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--格式化文本-->
             <TextView
@@ -280,13 +283,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/label_set_text_format" />
+                android:text="@string/label_set_text_format"/>
 
             <Spinner
                 android:id="@+id/formatText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"/>
 
             <!--自定义Marker-->
             <Button
@@ -294,7 +297,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/label_add_custom_marker" />
+                android:text="@string/label_add_custom_marker"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

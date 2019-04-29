@@ -79,6 +79,8 @@ public class RulerView extends View {
      */
     private ColorStateList mRulerColor;
 
+    private ColorStateList mCircleColor;
+
     /**
      * 区间刻度数
      */
@@ -146,6 +148,7 @@ public class RulerView extends View {
 
     private Paint mRulerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private TextPaint mLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private float mLastX;
     private float mDownX;
@@ -229,6 +232,7 @@ public class RulerView extends View {
 
         setScaleColor(a.getColor(R.styleable.RulerView_scaleColor, Color.BLACK));
         setRulerColor(a.getColor(R.styleable.RulerView_rulerColor, Color.BLACK));
+        setCircleColor(a.getColor(R.styleable.RulerView_circleColor, Color.RED));
 
         mSectionScaleCount = a.getInt(R.styleable.RulerView_sectionScaleCount, 10);
         mIndicator = a.getDrawable(R.styleable.RulerView_indicator);
@@ -251,6 +255,7 @@ public class RulerView extends View {
         setTextSize(a.getDimension(R.styleable.RulerView_android_textSize, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, displayMetrics)));
         setTextColor(a.getColorStateList(R.styleable.RulerView_android_textColor));
         setValue(mValue);
+
         a.recycle();
     }
 
@@ -322,14 +327,11 @@ public class RulerView extends View {
         final int paddingLeft = getPaddingLeft();
         final int paddingRight = getPaddingRight();
         final int paddingTop = getPaddingTop();
-        final int paddingBottom = getPaddingBottom();
         final int width = getWidth();
         final int height = getHeight();
-        final int rulerHeight = height - mMarkerHeight;
         final int insetWidth = width - paddingLeft - paddingRight;
         final int halfInsetWidth = insetWidth / 2;
         final float scaleSize = mScaleSize;
-        final float rulerSize = mRulerSize;
         final int maxScaleCount = mMaxValue;
         final int minScaleCount = mMinValue;
         final int[] drawableState = getDrawableState();
@@ -340,7 +342,24 @@ public class RulerView extends View {
         if (null != mTextColor) {
             mLabelPaint.setColor(mTextColor.getColorForState(drawableState, Color.BLACK));
         }
-        final float fontY = rulerSize + mScaleMaxHeight + mFontMetrics.bottom * 4;
+
+        //Draw indicator
+        if (null != mIndicator) {
+            final Drawable indicator = mIndicator;
+            if (indicator.isStateful()) {
+                indicator.setState(drawableState);
+            }
+            indicator.setBounds(
+                    paddingLeft + halfInsetWidth - indicator.getIntrinsicWidth() / 2,
+                    paddingTop,
+                    paddingLeft + halfInsetWidth + indicator.getIntrinsicWidth() / 2,
+                    mIndicator.getIntrinsicHeight()
+            );
+            indicator.draw(canvas);
+        }
+
+        float indicatorTextHeight = mLabelPaint.getTextSize();
+        final float fontY = mIndicator.getMinimumHeight() + indicatorTextHeight;//(rulerHeight - mScaleMaxHeight) / 2f + mScaleMaxHeight + mFontMetrics.bottom;
         int count = contentOffset / mStepWidth;
         for (int index = Math.min(count, maxScaleCount); index >= minScaleCount; index--) {
             int scalePosition = index * mStepWidth;
@@ -388,8 +407,8 @@ public class RulerView extends View {
                 int scalePosition = marker.value() * mStepWidth;
                 marker.getBounds(mTempRect);
                 final float centerX = paddingLeft + halfInsetWidth + scalePosition - contentOffset;
-                final float left = centerX - mTempRect.width() / 2;
-                final float right = centerX + mTempRect.width() / 2;
+                final float left = centerX - mTempRect.width() / 2f;
+                final float right = centerX + mTempRect.width() / 2f;
                 final float x = left, y = height - mMarkerHeight;
                 marker.setX(x);
                 marker.setY(y);
@@ -402,20 +421,13 @@ public class RulerView extends View {
             }
         }
 
-        //Draw indicator
-        if (null != mIndicator) {
-            final Drawable indicator = mIndicator;
-            if (indicator.isStateful()) {
-                indicator.setState(drawableState);
-            }
-            indicator.setBounds(
-                    paddingLeft + halfInsetWidth - indicator.getIntrinsicWidth() / 2,
-                    paddingTop,
-                    paddingLeft + halfInsetWidth + indicator.getIntrinsicWidth() / 2,
-                    mIndicator.getIntrinsicHeight()
-            );
-            indicator.draw(canvas);
-        }
+        //Drawing Circle
+        mCirclePaint.setColor(mCircleColor.isStateful() ? mCircleColor.getColorForState(drawableState, Color.BLACK) : mCircleColor.getDefaultColor());
+
+        float circleY = (height - mIndicator.getIntrinsicHeight()) / 2f + mIndicator.getIntrinsicHeight();
+        float topAndBottomCirclePadding = 8;
+        float radius = (height - mIndicator.getIntrinsicHeight()) / 2f - 2f * topAndBottomCirclePadding;
+        canvas.drawCircle(halfInsetWidth, circleY, radius, mCirclePaint);
     }
 
     private int getValueForContentOffset(int contentOffset) {
@@ -434,7 +446,6 @@ public class RulerView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         final float x = event.getX();
         final float y = event.getY();
-        boolean result = super.onTouchEvent(event);
         int pointerCount = event.getPointerCount();
         int width = getWidth();
         switch (event.getActionMasked()) {
@@ -721,6 +732,15 @@ public class RulerView extends View {
         invalidate();
     }
 
+    public void setCircleColor(ColorStateList color) {
+        mCircleColor = color;
+        invalidate();
+    }
+
+    public void setCircleColor(@ColorInt int color) {
+        setCircleColor(ColorStateList.valueOf(color));
+    }
+
     /**
      * 获取大刻度和大刻度之间的小刻度数
      *
@@ -986,6 +1006,7 @@ public class RulerView extends View {
         mStepWidth = savedState.mStepWidth;
         mScaleColor = savedState.mScaleColor;
         mRulerColor = savedState.mRulerColor;
+        mCircleColor = savedState.mCircleColor;
         mSectionScaleCount = savedState.mSectionScaleCount;
         mScaleMinHeight = savedState.mScaleMinHeight;
         mScaleMaxHeight = savedState.mScaleMaxHeight;
@@ -1013,6 +1034,7 @@ public class RulerView extends View {
         state.mStepWidth = mStepWidth;
         state.mScaleColor = mScaleColor;
         state.mRulerColor = mRulerColor;
+        state.mCircleColor = mCircleColor;
         state.mSectionScaleCount = mSectionScaleCount;
         state.mScaleMinHeight = mScaleMinHeight;
         state.mScaleMaxHeight = mScaleMaxHeight;
@@ -1046,6 +1068,7 @@ public class RulerView extends View {
         private int mStepWidth;
         private ColorStateList mScaleColor;
         private ColorStateList mRulerColor;
+        private ColorStateList mCircleColor;
         private int mSectionScaleCount;
         private int mScaleMinHeight;
         private int mScaleMaxHeight;
@@ -1067,6 +1090,7 @@ public class RulerView extends View {
             mStepWidth = source.readInt();
             mScaleColor = source.readParcelable(ColorStateList.class.getClassLoader());
             mRulerColor = source.readParcelable(ColorStateList.class.getClassLoader());
+            mCircleColor = source.readParcelable(ColorStateList.class.getClassLoader());
             mSectionScaleCount = source.readInt();
             mScaleMinHeight = source.readInt();
             mScaleMaxHeight = source.readInt();
@@ -1094,6 +1118,7 @@ public class RulerView extends View {
             out.writeInt(mStepWidth);
             out.writeParcelable(mScaleColor, 0);
             out.writeParcelable(mRulerColor, 0);
+            out.writeParcelable(mCircleColor, 0);
             out.writeInt(mSectionScaleCount);
             out.writeInt(mScaleMinHeight);
             out.writeInt(mScaleMaxHeight);
